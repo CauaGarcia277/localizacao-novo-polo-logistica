@@ -7,10 +7,10 @@ CAMINHO = Path(r"C:\Users\garci\OneDrive\Desktop\Projeto Exportação\Base_dados
 df_bruto = pd.read_excel(CAMINHO, sheet_name="Exportacoes", dtype=str)
 
 ##Verificando o tipo das colunas
-#print(df_bruto.dtypes)
+print(df_bruto.dtypes)
 
 ##Vizualizando a quantidade de valores nulos
-#print(df_bruto.isnull().sum())
+print(df_bruto.isnull().sum())
 coluna = ['Polo', 'Categoria', 'Estado_Destino', 'Cidade_Destino', 'Cliente', 'Forma_Pagamento', 'Status', 'Cod_Peca', 'Quantidade']
 
 for c in coluna:
@@ -45,8 +45,6 @@ print(f'Datas futuras: {futuras.sum()}')
 df_bruto['Data_Exportacao'] = df_bruto['Data_Exportacao'].fillna('NaT') ##Inserindo valores para os nulos
 nulas = df_bruto["Data_Exportacao"].isna()
 print(f'Datas nulas: {nulas.sum()}')
-print("-------------------------")
-
 
 ##Tratando a coluna Polo
 
@@ -330,3 +328,110 @@ df_bruto.loc[df_bruto['Quantidade'] <= 0, 'Quantidade_Status'] = 'Incorreto' ##I
 print("-------------------------")
 print("COLUNA VALOR UNITARIO")
 print("-------------------------")
+
+unico = df_bruto['Valor_Unitario']
+print(f'Valores não padronizados: {unico.count()}')
+
+def limpar_valor(txt): ##definindo uma função
+    if pd.isna(txt): ##Caso o dataframe for null, retorna null
+        return 'NaN'
+    t = txt.replace('R$', '').strip() ##Tira o cifrão
+    if ',' in t:
+        t = t.replace('.', '').replace(',', '.') ##Troca virgula por ponto
+    return t
+
+df_bruto['Valor_Unitario'] = pd.to_numeric(df_bruto['Valor_Unitario'].apply(limpar_valor), errors='coerce')
+
+unico = df_bruto['Valor_Unitario'].unique()
+padrao = df_bruto['Valor_Unitario']
+nulos = df_bruto['Valor_Unitario'].isna()
+print(f'Valores padronizados: {padrao.count()}')
+print(f'Valores nulos: {nulos.sum()}')
+
+print(sorted(df_bruto['Valor_Unitario'].dropna().unique().tolist())) ## Vizuaizando os valores únicos e usando tolist para deixar em decimal
+
+print(df_bruto['Valor_Unitario'].nlargest(5))## Os 5 maiores
+print((df_bruto['Valor_Unitario'] == 0).sum())## Quantos zeros
+print((df_bruto['Valor_Unitario'] > 1000).sum())## Quantos acima do limite
+
+##Criando coluna auxiliar
+df_bruto['Valor_Unitario_Status'] = 'Informado'
+df_bruto.loc[df_bruto['Valor_Unitario'].isna(), 'Valor_Unitario_Status'] = 'Não informado'
+df_bruto.loc[df_bruto['Valor_Unitario'] >= 1000, 'Valor_Unitario_Status'] = 'Incorreto'
+df_bruto.loc[df_bruto['Valor_Unitario'] == 0.0, 'Valor_Unitario_Status'] = 'Incorreto'
+
+padrao = df_bruto['Valor_Unitario']
+nulos = df_bruto['Valor_Unitario'].isna()
+
+
+##Tratando a coluna Custo_Frete
+print("-------------------------")
+print("COLUNA CUSTO FRETE")
+print("-------------------------")
+
+nulos = df_bruto['Custo_Frete'].isna().sum()
+unicos = df_bruto['Custo_Frete'].unique()
+print(f'Quantidade de custo frete nulos antes: {nulos}')
+
+
+df_bruto['Custo_Frete'] = pd.to_numeric(df_bruto['Custo_Frete'].apply(limpar_valor), errors='coerce')
+
+unicos = df_bruto['Custo_Frete'].unique()
+nulos = df_bruto['Custo_Frete'].isna().sum()
+print(f'Quantidade de custo frete nulos depois: {nulos}')
+
+##Criando coluna auxiliar
+df_bruto['Custo_Frete_Status'] = 'Informado'
+df_bruto.loc[df_bruto['Custo_Frete'].isna(), 'Custo_Frete_Status'] = 'Não informado'
+df_bruto.loc[df_bruto['Custo_Frete'] >= 4000, 'Custo_Frete_Status'] = 'Incorreto'
+df_bruto.loc[df_bruto['Custo_Frete'] == 0.0, 'Custo_Frete_Status'] = 'Incorreto'
+
+
+##Tratando a coluna Cliente
+print("-------------------------")
+print("COLUNA CLIENTE")
+print("-------------------------")
+unicos = df_bruto['Cliente'].unique()
+print(f'Quantidade de nomes sem padrão: {len(unicos)}')
+
+nao_informados = ['N/D', '-']
+df_bruto['Cliente'] = df_bruto['Cliente'].replace(nao_informados, 'Não informado')
+df_bruto['Cliente'] = df_bruto['Cliente'].str.title().str.rstrip()
+unicos = df_bruto['Cliente'].unique()
+print(f'Quantidade de nomes padronizados: {len(unicos)}')
+
+
+##Tratando a coluna Forma_Pagamento
+print("-------------------------")
+print("COLUNA FORMA DE PAGAMENTO")
+print("-------------------------")
+
+unicos = df_bruto['Forma_Pagamento'].unique()
+print(f'Quantidade de formas de pagamento sem padrão: {len(unicos)}')
+
+df_bruto['Forma_Pagamento'] = df_bruto['Forma_Pagamento'].str.capitalize().str.rstrip()
+
+incorreto = ['N/d', '-', 'Não Informado']
+
+df_bruto['Forma_Pagamento'] = df_bruto['Forma_Pagamento'].replace(incorreto, 'Não informado')
+unicos = df_bruto['Forma_Pagamento'].unique()
+print(f'Quantidade de formas de pagamento padronizados: {len(unicos)}')
+
+
+##Tratando a coluna Status
+print("-------------------------")
+print("COLUNA STATUS")
+print("-------------------------")
+
+unicos = df_bruto['Status'].unique()
+print(f'Quantidade de status sem padrão: {len(unicos)}')
+
+df_bruto['Status'] = df_bruto['Status'].str.capitalize().str.rstrip()
+
+incorreto = ['-']
+df_bruto['Status'] = df_bruto['Status'].replace(incorreto, 'Não informado')
+
+unicos = df_bruto['Status'].unique()
+print(f'Quantidade de formas de pagamento padronizados: {len(unicos)}')
+
+
