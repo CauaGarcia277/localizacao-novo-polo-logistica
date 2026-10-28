@@ -2,28 +2,28 @@ from pathlib import Path
 import pandas as pd
 
 ## Informando o caminho do arquivo excel
-CAMINHO = Path(r"C:\Users\garci\OneDrive\Desktop\Projeto Exportação\Base_dados\exportacoes_empresa_ficticia.xlsx")
-
+CAMINHO = Path(r"ADICIONE O CAMINHO DO ARQUIVO AQUI")
+CAMINHO_KM = Path
 df_bruto = pd.read_excel(CAMINHO, sheet_name="Exportacoes", dtype=str)
 
 ##Verificando o tipo das colunas
-print(df_bruto.dtypes)
+#print(df_bruto.dtypes)
 
 ##Vizualizando a quantidade de valores nulos
-print(df_bruto.isnull().sum())
+print(f'Quantidade de linhas nulas por categoria: {df_bruto.isnull().sum()}')
 coluna = ['Polo', 'Categoria', 'Estado_Destino', 'Cidade_Destino', 'Cliente', 'Forma_Pagamento', 'Status', 'Cod_Peca', 'Quantidade']
 
 for c in coluna:
     df_bruto[c] = df_bruto[c].fillna('Não informado')
 
 
-print(df_bruto.isnull().sum())
+print(f'Quantidade de linhas nulas por categoria após preencher: {df_bruto.isnull().sum()}')
 
 ##Excluindo duplicidade
 print(f'Quantidade de linhas totais: {df_bruto['ID_Pedido'].count()}')
 
 df_bruto = df_bruto.drop_duplicates(subset = 'ID_Pedido')
-print(f'Quantidade de linhas após exclusão: {df_bruto['ID_Pedido'].count()}')
+print(f'Quantidade de linhas após exclusão de duplicatas: {df_bruto['ID_Pedido'].count()}')
 
 ##Tratando valores da coluna Data_Exportacao
 print("-------------------------")
@@ -37,7 +37,7 @@ df_bruto["Data_Exportacao"] = pd.to_datetime(
 )
 
 df_bruto["Data_Exportacao"].dt.strftime("%d/%m/%Y")
-
+df_bruto['Data_Exportacao'] = df_bruto['Data_Exportacao']
 
 futuras = df_bruto["Data_Exportacao"] > pd.Timestamp.today() ##Verificando datas futuras
 print(f'Datas futuras: {futuras.sum()}')
@@ -64,13 +64,13 @@ print("Excluindo Polos não informados") ##Informando dados
 print(f"Antes: {antes} | Depois: {len(df_bruto)} | Excluídas: {len(excluidas)}")
 
 #Padronizando os valores
-print(df_bruto['Polo'].unique()) #Identificando valores unicos
+#print(df_bruto['Polo'].unique()) #Identificando valores unicos
 sp = ['S. Paulo', 'SP', 'São Paulo', 'Sao Paulo', ' SP', 'sp', 'POLO SP', 'Polo SP']
 rs = ['RS ', 'Porto Alegre', 'RS', 'R. Grande do Sul', 'POLO RS', 'Polo RS', 'Rio Grande do Sul', 'rs']
 
 df_bruto['Polo'] = df_bruto['Polo'].replace(sp, 'SP')
 df_bruto['Polo'] = df_bruto['Polo'].replace(rs, 'RS')
-print(df_bruto['Polo'].unique()) ##Verificando normalidade
+#print(df_bruto['Polo'].unique()) ##Verificando normalidade
 
 quant_sp = df_bruto['Polo'].eq('SP').sum()
 quant_rs = df_bruto['Polo'].eq('RS').sum()
@@ -110,7 +110,7 @@ print(f'Quantidade Cod_Peca não informados: {nao_informado}')
 print(f'Quantidade informada: {informado.count()}')
 
 codigos = ['P001', 'P002', 'P003', 'P004', 'P005', 'P006', 'P007', 'P008', 'P009', 'P010'] ## Armazenando os códigos
-print(df_bruto[['Cod_Peca', 'Peca']].drop_duplicates().sort_values('Cod_Peca')) ##Vizualizando os nomes únicos e seus Códigos
+#print(df_bruto[['Cod_Peca', 'Peca']].drop_duplicates().sort_values('Cod_Peca')) ##Vizualizando os nomes únicos e seus Códigos
 
 ##Após vizualizar e organizar o código abaixo sobreo  código da peça e o nome da peça, foi escrito os valores nulos
 ## Da coluna cod_peca fazendo engenharia reversa pelo nome da coluna Peca
@@ -141,7 +141,7 @@ nomes = { ##Definindo os nomes para cada código padronizando
 }
 
 df_bruto['Peca'] = df_bruto['Cod_Peca'].map(nomes)
-print(df_bruto[['Cod_Peca', 'Peca']].drop_duplicates().sort_values('Cod_Peca'))
+#print(df_bruto[['Cod_Peca', 'Peca']].drop_duplicates().sort_values('Cod_Peca'))
 
 print(f'Quantidade Cod_Peca não informados: {nao_informado}')
 print(f'Quantidade informada: {informado.count()}')
@@ -159,13 +159,13 @@ print(f'Categorias não informadas: {nao_informado}')
 print(f'Categoria informada: {informado}')
 
 categoria_unica = df_bruto['Categoria'].unique()
-print(categoria_unica)
+print(f'Quantidade de valores sem padronizar: {len(categoria_unica)}')
 
 df_bruto['Categoria'] = df_bruto['Categoria'].str.capitalize() ##Padronizando para todos estarem apenas com a primeira letra em maiúsculo
 modificar = ['N/d', '-'] ##Armazenando diferanças
 df_bruto['Categoria'] = df_bruto['Categoria'].replace(modificar, 'Não informado')
 categoria_unica = df_bruto['Categoria'].unique()
-print(categoria_unica)
+print(f'Quantidade de valores após padronizar: {len(categoria_unica)}')
 
 nao_informado = df_bruto['Categoria'].eq('Não informado').sum()
 informado = df_bruto['Categoria'].ne('Não informado').sum()
@@ -174,7 +174,7 @@ print(f'Categoria informada: {informado}')
 
 ##Verificando a padronização dos códigos e onde os não informados estão
 cod_categoria = df_bruto[['Cod_Peca', 'Categoria']].drop_duplicates().sort_values('Cod_Peca') 
-print(cod_categoria)
+print(f'Quantidade de valores sem padronizar: {len(cod_categoria)}')
 
 padrao_categoria = {
     'P001': 'Fixadores',
@@ -191,12 +191,7 @@ padrao_categoria = {
 
 df_bruto['Categoria'] = df_bruto['Cod_Peca'].map(padrao_categoria).fillna('Não informado')
 cod_categoria_padrao = df_bruto[['Cod_Peca', 'Categoria']].drop_duplicates().sort_values('Cod_Peca') ##Verificando se está padronizado
-print(cod_categoria_padrao)
-
-nao_informado = df_bruto['Categoria'].eq('Não informado').sum()
-informado = df_bruto['Categoria'].ne('Não informado').sum()
-print(f'Categorias não informadas: {nao_informado}')
-print(f'Categoria informada: {informado}')
+print(f'Quantidade de valores após padronizar: {len(cod_categoria_padrao)}')
 
 
 
@@ -207,7 +202,7 @@ print("-------------------------")
 ##Verificando os dados unicos
 df_bruto['Estado_Destino'] = df_bruto['Estado_Destino'].str.upper().str.strip()
 estado_unico = df_bruto['Estado_Destino'].unique()
-print(estado_unico)
+print(f'Quantidade de valores sem padronizar: {len(estado_unico)}')
 
 ##Estados
 estados = {
@@ -229,7 +224,7 @@ for sigla, variacoes in estados.items():
     df_bruto['Estado_Destino'] = df_bruto['Estado_Destino'].replace(variacoes, sigla)
 
 estado_unico = df_bruto['Estado_Destino'].unique()
-print(estado_unico)
+print(f'Quantidade de valores após padronizar: {len(estado_unico)}')
 
 
 ##Tratando a coluna Cidade_Destino
@@ -238,7 +233,8 @@ print("COLUNA CIDADE DESTINO")
 print("-------------------------")
 
 df_bruto['Cidade_Destino'] = df_bruto['Cidade_Destino'].str.title().str.strip()
-print(df_bruto['Cidade_Destino'].unique()) ##Verificando cidades
+unico = df_bruto['Cidade_Destino'].unique() ##Verificando cidades
+print(f'Quantidade de valores sem padronizar: {len(unico)}')
 
 cidades = {
     'São José dos Campos': ['São José Dos Campos', 'São José Dos Campo'],
@@ -268,7 +264,8 @@ cidades = {
 for correto, variacoes in cidades.items():
     df_bruto['Cidade_Destino'] = df_bruto['Cidade_Destino'].replace(variacoes, correto)
 
-print(df_bruto['Cidade_Destino'].unique())
+unico = df_bruto['Cidade_Destino'].unique()
+print(f'Quantidade de valores após padronizar: {len(unico)}')
 
 
 
@@ -284,7 +281,8 @@ print(f'Quantidade informada: {quantidade.sum()}')
 print(f'Quantidade não informada: {nao_informado.sum()}')
 
 ##Verificando dados unicos
-print(df_bruto['Quantidade'].unique())
+unico = df_bruto['Quantidade'].unique()
+print(f'Quantidade de valores sem padronizar: {len(unico)}')
 
 quantidades = {
     '5': ['5 ', '5 un', '5 UN.'],
@@ -305,7 +303,9 @@ quantidades = {
 for correto, variacoes in quantidades.items():
     df_bruto['Quantidade'] = df_bruto['Quantidade'].replace(variacoes, correto)
 
-print(df_bruto['Quantidade'].unique())
+unico = df_bruto['Quantidade'].unique()
+print(f'Quantidade de valores após padronizar: {len(unico)}')
+
 
 #Transformando a coluna em numérica
 df_bruto['Quantidade'] = pd.to_numeric(df_bruto['Quantidade'], errors='coerce')
@@ -348,11 +348,11 @@ nulos = df_bruto['Valor_Unitario'].isna()
 print(f'Valores padronizados: {padrao.count()}')
 print(f'Valores nulos: {nulos.sum()}')
 
-print(sorted(df_bruto['Valor_Unitario'].dropna().unique().tolist())) ## Vizuaizando os valores únicos e usando tolist para deixar em decimal
+#print(sorted(df_bruto['Valor_Unitario'].dropna().unique().tolist())) ## Vizuaizando os valores únicos e usando tolist para deixar em decimal
 
-print(df_bruto['Valor_Unitario'].nlargest(5))## Os 5 maiores
-print((df_bruto['Valor_Unitario'] == 0).sum())## Quantos zeros
-print((df_bruto['Valor_Unitario'] > 1000).sum())## Quantos acima do limite
+#print(df_bruto['Valor_Unitario'].nlargest(5))## Os 5 maiores
+#print((df_bruto['Valor_Unitario'] == 0).sum())## Quantos zeros
+#print((df_bruto['Valor_Unitario'] > 1000).sum())## Quantos acima do limite
 
 ##Criando coluna auxiliar
 df_bruto['Valor_Unitario_Status'] = 'Informado'
@@ -435,3 +435,35 @@ unicos = df_bruto['Status'].unique()
 print(f'Quantidade de formas de pagamento padronizados: {len(unicos)}')
 
 
+##Realizando o cálculo de gasto de transporte
+
+preco_gasolina = 6.60    # R$/litro (mesmo valor da aba Parametros)
+consumo = 8.0            # km/litro
+voltas = 1               # 1 = só ida, 2 = ida e volta
+
+caminho = Path(r"ADICIONE O CAMINHO DO ARQUIVO DISTANCIAS AQUI")
+dist_cidades = pd.read_excel(caminho, sheet_name="Distancias_Cidades")
+dist_estados = pd.read_excel(caminho, sheet_name="Distancias_Estados").dropna(subset=["ID_Polo"])
+
+# Distância pela cidade
+df = df_bruto.merge(
+    dist_cidades[["ID_Polo", "Cidade_Destino", "Distancia_km"]],
+    left_on=["Polo", "Cidade_Destino"],
+    right_on=["ID_Polo", "Cidade_Destino"],
+    how="left",
+).drop(columns="ID_Polo")
+
+# Quando a cidade não casa, usa a média do estado
+df = df.merge(
+    dist_estados[["ID_Polo", "UF_Destino", "Distancia_Media_km"]],
+    left_on=["Polo", "Estado_Destino"],
+    right_on=["ID_Polo", "UF_Destino"],
+    how="left",
+).drop(columns=["ID_Polo", "UF_Destino"])
+
+df_bruto["Distancia_km"] = df["Distancia_km"].fillna(df["Distancia_Media_km"])
+
+#Custo de combustível por pedido
+df_bruto["Custo_Combustivel"] = df["Distancia_km"] * voltas / consumo * preco_gasolina
+
+df_bruto.to_excel('planilha.xlsx', index = False, sheet_name= 'Página1')
