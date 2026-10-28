@@ -129,4 +129,98 @@ Combustível: gasolina a R$ 6,60/litro (média nacional ANP de 24/07/2026) e con
 
 # Principais Resultados
 
+Aqui serão apresentados os resultados do projeto, conténdo quantidade de valores nulos e antes e depois depois da padronização.
 
+## Resultado 1
+Contabilizando os valores nulos de cada coluna foi possível identificar a quantidade por coluna, sendo o primeiro tratamento. Custo_Frete e Valor_Unitário e Data_Exportação não foram preenchidos pois Data_Exportação é de tipo data e os outros são valores numéricos.
+![Imagem1](Fotos/Capturadetela.png)
+
+## Resultado 2
+Por coluna foi possível identificar valores que não são nulos mas com informações indicando nulos. Para a Coluna Polo foi exclúido os valores não informados (Anteriormente nulos) pois sem eles não seria possível a análise.
+
+Para a coluna Peca e Cod_Peca foram utilizados tratamentos de engenharia reversa, pois um código representava o nome de uma peça, então para resolver os valores que tinham não informados em uma coluna foi feito a busca por outro registro que continha o mesmo nome ou código. Os que tinham valores não informados em ambos foram excluídos no Power Query.
+
+![Imagem1](Fotos/Capturadetela2.png)
+
+## Resultado 3
+
+Coluna Categoria teve um aumento de não informado, isso aconteceu por conta de que existiam registros com valores que representavam nulos como "-" e "N/d" que foram contabilizados como informados, então após tratar eles corretamentes o número aumentou.
+
+Para Cidade Destino e Estado Destino foram feitos os mesmos padrões com engenharia reversa igual ao Cod_Peca e Peca, mas isso no Power Query.
+
+Quantidade e Valor Unitário tiveram seus nulos mantidos, pois foi criado colunas auxiliares de Status para avisar os erros e nulos, não adicionando valores de suposição.
+
+![Imagem1](Fotos/Capturadetela3.png)
+
+## Resultado 4
+
+Após a padronização é possível identificar que existiam vários registros sem padrão, tendo uma diminuição drástica de quantidade de valores inconsistêntes.
+
+![Imagem1](Fotos/Capturadetela4.png)
+
+
+## Antes e depois
+
+Antes:
+
+![Imagem1](Fotos/Antes.png)
+
+Depois:
+
+![Imagem1](Fotos/Depois.png)
+
+
+## Dashboard
+
+![Imagem1](Fotos/Dashboard.png)
+
+![Imagem1](Fotos/Dashboard2.png)
+
+--- 
+# Conclusão
+
+A análise permitiu identificar a importância de analisar, tratar os dados de forma correta e entender o objetivo central da análise para entregar o resultado mais acertivo possível.
+
+Com base nos resultados, foi possível apresentar uma recomendação relacionada ao estado que deverá apadrinhar um novo polo, sendo este Goiás, pois levando em consideração os estados vizinhos beneficiados e seus números de gasto, foi possível comparar com outros estados usando a mesma métrica e visualizar que teria a maior porcentagem e número de gastos.
+
+O projeto demonstrou como a utilização de dados pode contribuir para a análise de problemas e para a tomada de decisões.
+
+---
+# Como Executar o Projeto
+
+## Pré-requisitos
+
+Python instalado.
+
+Git instalado.
+
+Bibliotecas necessárias para a análise:
+
+- Pandas
+--- 
+# Aprendizados
+
+Durante o desenvolvimento, foram praticados:
+
+- Manipulação e análise de dados.
+
+- Tratamento e transformação de informações.
+
+- Construção de indicadores.
+
+- Desenvolvimento de visualizações.
+
+- Interpretação de resultados.
+
+- Documentação e organização de projetos.
+
+--- 
+# Autor
+
+Cauã Garcia Gomes Barbosa
+
+Estudante de Análise de Dados, desenvolvendo projetos com Python, SQL e ferramentas de visualização.
+
+GitHub:GitHub: https://github.com/CauaGarcia277
+
+LinkedIn: https://www.linkedin.com/in/cauagarcia
